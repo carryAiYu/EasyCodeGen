@@ -57,6 +57,7 @@ public class VelocityUtils {
             // 生成代码
             velocityEngine.evaluate(velocityContext, stringWriter, "Velocity Code Generate", template);
         } catch (Exception e) {
+            e.printStackTrace();
             // 将异常全部捕获，直接返回，用于写入模板
             StringBuilder builder = new StringBuilder("在生成代码时，模板发生了如下语法错误：\n");
             StringWriter writer = new StringWriter();

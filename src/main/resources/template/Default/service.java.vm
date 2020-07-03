@@ -1,7 +1,7 @@
 ##定义初始变量
 #set($tableName = $tool.append($tableInfo.name, "Service"))
 ##设置回调
-$!callback.setFileName($tool.append($tableName, ".java"))
+$!callback.setFileName($tool.append("I", $tableName, ".java"))
 $!callback.setSavePath($tool.append($tableInfo.savePath, "/service"))
 
 ##拿到主键
@@ -11,8 +11,11 @@ $!callback.setSavePath($tool.append($tableInfo.savePath, "/service"))
 
 #if($tableInfo.savePackageName)package $!{tableInfo.savePackageName}.#{end}service;
 
-import $!{tableInfo.savePackageName}.entity.$!{tableInfo.name};
-import java.util.List;
+$tool.append("import") $!{tableInfo.savePackageName}$tool.append(".entity.")$!{tableInfo.name}Entity;
+$tool.append("import") $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}DTO;
+$tool.append("import") $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}VO;
+$tool.append("import") $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}QueryVO;
+import org.springframework.data.domain.Page;
 
 /**
  * $!{tableInfo.comment}($!{tableInfo.name})表服务接口
@@ -20,47 +23,44 @@ import java.util.List;
  * @author $!author
  * @since $!time.currTime()
  */
-public interface $!{tableName} {
+public interface I$!{tableName} {
 
     /**
      * 通过ID查询单条数据
      *
-     * @param $!pk.name 主键
+     * @param $!tool.firstLowerCase($tableInfo.name)QueryVO 查询参数
      * @return 实例对象
      */
-    $!{tableInfo.name} queryById($!pk.shortType $!pk.name);
+    $!{tableInfo.name}DTO fineOne($!{tableInfo.name}QueryVO $!tool.firstLowerCase($tableInfo.name)QueryVO);
 
     /**
      * 查询多条数据
      *
-     * @param offset 查询起始位置
-     * @param limit 查询条数
+     * @param $!tool.firstLowerCase($tableInfo.name)QueryVO 查询参数
      * @return 对象列表
      */
-    List<$!{tableInfo.name}> queryAllByLimit(int offset, int limit);
+    Page<$!{tableInfo.name}DTO> queryAll($!{tableInfo.name}QueryVO $!tool.firstLowerCase($tableInfo.name)QueryVO);
 
     /**
      * 新增数据
      *
-     * @param $!tool.firstLowerCase($!{tableInfo.name}) 实例对象
-     * @return 实例对象
+     * @param $!tool.firstLowerCase($tableInfo.name)VO 实例对象
      */
-    $!{tableInfo.name} insert($!{tableInfo.name} $!tool.firstLowerCase($!{tableInfo.name}));
+    void newOne($!{tableInfo.name}VO $!tool.firstLowerCase($tableInfo.name)VO);
 
     /**
      * 修改数据
      *
-     * @param $!tool.firstLowerCase($!{tableInfo.name}) 实例对象
-     * @return 实例对象
+     * @param $!tool.firstLowerCase($tableInfo.name)VO 实例对象
      */
-    $!{tableInfo.name} update($!{tableInfo.name} $!tool.firstLowerCase($!{tableInfo.name}));
+    void updateOne($!{tableInfo.name}VO $!tool.firstLowerCase($tableInfo.name)VO);
 
     /**
-     * 通过主键删除数据
+     * 删除数据
      *
-     * @param $!pk.name 主键
+     * @param $!tool.firstLowerCase($tableInfo.name)QueryVO 参数
      * @return 是否成功
      */
-    boolean deleteById($!pk.shortType $!pk.name);
+    boolean delOne($!{tableInfo.name}QueryVO $!tool.firstLowerCase($tableInfo.name)QueryVO);
 
 }

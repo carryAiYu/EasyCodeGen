@@ -39,10 +39,10 @@ public class MainAction extends AnAction {
         }
 
         // 校验类型映射
-        if (!TableInfoService.getInstance(project).typeValidator(CacheDataUtils.getInstance().getSelectDbTable())) {
-            // 没通过不打开窗口
-            return;
-        }
+//        if (!TableInfoService.getInstance(project).typeValidator(CacheDataUtils.getInstance().getSelectDbTable())) {
+//            // 没通过不打开窗口
+//            return;
+//        }
         //开始处理
         new SelectSavePath(event.getProject()).open();
     }

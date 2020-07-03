@@ -19,6 +19,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 表配置窗口
@@ -146,9 +147,9 @@ public class ConfigTableDialog extends JDialog {
         tableInfo.getFullColumn().forEach(columnInfo -> {
             List<Object> dataList = new ArrayList<>();
             dataList.add(columnInfo.getName());
-            dataList.add(columnInfo.getType());
+            dataList.add(columnInfo.getJdbcType());
             dataList.add(columnInfo.getComment());
-            //渲染附加数据
+            // 渲染附加数据
             if (columnInfo.getExt() != null && !columnInfo.getExt().isEmpty()) {
                 // 跳过默认的3条数据
                 for (int i = 3; i < tableModel.getColumnCount(); i++) {
@@ -186,7 +187,7 @@ public class ConfigTableDialog extends JDialog {
                     columnInfo.setName((String) val);
                     break;
                 case 1:
-                    columnInfo.setType((String) val);
+                    columnInfo.setJdbcType((String) val);
                     break;
                 case 2:
                     columnInfo.setComment((String) val);
@@ -238,7 +239,8 @@ public class ConfigTableDialog extends JDialog {
 
             ColumnInfo columnInfo = new ColumnInfo();
             columnInfo.setName(value);
-            columnInfo.setType("java.lang.String");
+            columnInfo.setJdbcType("varchar(255)");
+            columnInfo.setComment("");
             // 标记为自定义列
             columnInfo.setCustom(true);
             tableInfo.getFullColumn().add(columnInfo);
@@ -295,7 +297,9 @@ public class ConfigTableDialog extends JDialog {
     private List<ColumnConfig> getInitColumn(List<ColumnConfig> columnConfigList) {
         List<ColumnConfig> result = new ArrayList<>();
         result.add(new ColumnConfig("name", ColumnConfigType.TEXT));
-        result.add(new ColumnConfig("type", ColumnConfigType.TEXT));
+        TypeMapperGroup typeMapperGroup = CurrGroupUtils.getCurrTypeMapperGroup();
+        result.add(new ColumnConfig("jdbcType", ColumnConfigType.SELECT, typeMapperGroup.getElementList()
+                .stream().map(item -> item.getColumnType()).collect(Collectors.joining(","))));
         result.add(new ColumnConfig("comment", ColumnConfigType.TEXT));
         result.addAll(columnConfigList);
         return result;
@@ -305,7 +309,7 @@ public class ConfigTableDialog extends JDialog {
      * 打开窗口
      */
     public void open() {
-        setTitle("Config Table " + cacheDataUtils.getSelectDbTable().getName());
+        setTitle("Config Table " + cacheDataUtils.getSelectDbTable());
         pack();
         setLocationRelativeTo(null);
         setVisible(true);

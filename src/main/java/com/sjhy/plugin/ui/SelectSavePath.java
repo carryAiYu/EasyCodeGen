@@ -215,7 +215,18 @@ public class SelectSavePath extends JDialog {
         // 保存配置
         TableInfo tableInfo = tableInfoService.getTableInfoAndConfig(cacheDataUtils.getSelectDbTable());
         tableInfo.setSavePath(savePath);
-        tableInfo.setSavePackageName(packageField.getText());
+        if (!savePath.isEmpty()) {
+            String[] pathFiles = savePath.split("main/java");
+            if (pathFiles.length > 0) {
+                String pathFile = pathFiles[pathFiles.length - 1]
+                        .replace("/", ".")
+                        .replace("\\", ".");
+                tableInfo.setSavePackageName(pathFile);
+            }
+        }
+        if (packageField.getText() != null && !packageField.getText().isEmpty()) {
+            tableInfo.setSavePackageName(packageField.getText());
+        }
         tableInfo.setPreName(preField.getText());
         tableInfo.setTemplateGroupName((String) groupComboBox.getSelectedItem());
         Module module = getSelectModule();
@@ -320,6 +331,8 @@ public class SelectSavePath extends JDialog {
 
         // 获取选中的表信息（鼠标右键的那张表），并提示未知类型
         TableInfo tableInfo = tableInfoService.getTableInfoAndConfig(cacheDataUtils.getSelectDbTable());
+        System.out.println("-----------------------");
+        System.out.println(tableInfo);
         // 设置默认配置信息
         if (!StringUtils.isEmpty(tableInfo.getSaveModelName())) {
             moduleComboBox.setSelectedItem(tableInfo.getSaveModelName());

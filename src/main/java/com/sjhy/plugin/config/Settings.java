@@ -107,7 +107,11 @@ public class Settings implements PersistentStateComponent<Settings> {
         if (this.templateGroupMap == null) {
             this.templateGroupMap = new LinkedHashMap<>();
         }
-        this.templateGroupMap.put(DEFAULT_NAME, loadTemplateGroup(DEFAULT_NAME, "entity.java", "dao.java", "service.java", "serviceImpl.java", "controller.java", "mapper.xml", "debug.json"));
+        this.templateGroupMap.put(DEFAULT_NAME, loadTemplateGroup(DEFAULT_NAME,
+                "entity.java", "dao.java", "service.java", "serviceImpl.java",
+                "controller.java", "mapper.xml",
+                "debug.json", "crudrepository.java", "jparepository.java",
+                "vo.java", "dto.java", "queryvo.java"));
         this.templateGroupMap.put("MybatisPlus", loadTemplateGroup("MybatisPlus", "entity", "dao", "service", "serviceImpl", "controller"));
 
         //配置默认类型映射
@@ -116,16 +120,16 @@ public class Settings implements PersistentStateComponent<Settings> {
         }
         TypeMapperGroup typeMapperGroup = new TypeMapperGroup();
         List<TypeMapper> typeMapperList = new ArrayList<>();
-        typeMapperList.add(new TypeMapper("varchar(\\(\\d+\\))?", "java.lang.String"));
-        typeMapperList.add(new TypeMapper("char(\\(\\d+\\))?", "java.lang.String"));
+        typeMapperList.add(new TypeMapper("varchar(255)", "java.lang.String"));
+        typeMapperList.add(new TypeMapper("char(32)", "java.lang.String"));
         typeMapperList.add(new TypeMapper("text", "java.lang.String"));
-        typeMapperList.add(new TypeMapper("decimal(\\(\\d+\\))?", "java.lang.Double"));
-        typeMapperList.add(new TypeMapper("decimal(\\(\\d+,\\d+\\))?", "java.lang.Double"));
+        typeMapperList.add(new TypeMapper("decimal", "java.lang.Double"));
         typeMapperList.add(new TypeMapper("integer", "java.lang.Integer"));
-        typeMapperList.add(new TypeMapper("int(\\(\\d+\\))?", "java.lang.Integer"));
+        typeMapperList.add(new TypeMapper("int", "java.lang.Integer"));
         typeMapperList.add(new TypeMapper("int4", "java.lang.Integer"));
         typeMapperList.add(new TypeMapper("int8", "java.lang.Long"));
-        typeMapperList.add(new TypeMapper("bigint(\\(\\d+\\))?", "java.lang.Long"));
+        typeMapperList.add(new TypeMapper("tinyint", "java.lang.Integer"));
+        typeMapperList.add(new TypeMapper("bigint", "java.lang.Long"));
         typeMapperList.add(new TypeMapper("datetime", "java.util.Date"));
         typeMapperList.add(new TypeMapper("timestamp", "java.util.Date"));
         typeMapperList.add(new TypeMapper("boolean", "java.lang.Boolean"));

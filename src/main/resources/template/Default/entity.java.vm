@@ -1,31 +1,43 @@
 ##引入宏定义
 $!define
 
-##使用宏定义设置回调（保存位置与文件后缀）
-#save("/entity", ".java")
+$!callback.setFileName($tool.append($tableName, "Entity.java"))
+$!callback.setSavePath($tool.append($tableInfo.savePath, "/entity"))
 
 ##使用宏定义设置包后缀
 #setPackageSuffix("entity")
 
 ##使用全局变量实现默认包导入
 $!autoImport
+import com.paoba.base.common.domain.BaseEntity;
+import lombok.EqualsAndHashCode;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import org.hibernate.annotatinos.DynamicInsert;
+import org.hibernate.annotatinos.DynamicUpdate;
+
+
 import java.io.Serializable;
 
 ##使用宏定义实现类注释信息
 #tableComment("实体类")
-public class $!{tableInfo.name} implements Serializable {
+@Data
+@EqualsAndHashCode(callSuper = true)
+@Entity
+@@Table(name = "$tool.hump2Underline($tableInfo.name})")
+@DynamicUpdate
+@DynamicInsert
+@Accessors(chain = true)
+public class $!{tableInfo.name}Entity extends BaseEntity {
     private static final long serialVersionUID = $!tool.serial();
 #foreach($column in $tableInfo.fullColumn)
-    #if(${column.comment})/**
-    * ${column.comment}
-    */#end
-
+    @Column(name="$!{tool.hump2Underline($column.name)}", nullable = false, columnDefinition = "$!{$column.jdbcType} comment '$!{$column.comment}'")
     private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
 #end
 
-#foreach($column in $tableInfo.fullColumn)
-##使用宏定义实现get,set方法
-#getSetMethod($column)
-#end
-
+    public $!{tableInfo.name}Entity($!{tableInfo.name}VO $!tool.firstLowerCase($tableInfo.name)VO) {
+        #foreach($column in $tableInfo.fullColumn)
+            this.$!{column.name} = $!tool.firstLowerCase($tableInfo.name)VO$tool.append(".get")$!{column.name}$tool.append("()");
+        #end
+    }
 }

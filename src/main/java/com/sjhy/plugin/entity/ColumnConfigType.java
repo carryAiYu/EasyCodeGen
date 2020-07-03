@@ -13,5 +13,6 @@ public enum ColumnConfigType {
     // 下拉框类型
     SELECT,
     // 选中框类型
-    BOOLEAN
+    BOOLEAN,
+    OTHER
 }

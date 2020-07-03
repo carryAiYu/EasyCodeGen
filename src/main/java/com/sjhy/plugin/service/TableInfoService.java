@@ -1,6 +1,5 @@
 package com.sjhy.plugin.service;
 
-import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
 import com.sjhy.plugin.entity.TableInfo;
@@ -33,12 +32,10 @@ public interface TableInfoService {
     }
 
     /**
-     * 通过DbTable获取TableInfo
-     *
-     * @param dbTable 原始表对象
+     * init TableInfo
      * @return 表信息对象
      */
-    TableInfo getTableInfoByDbTable(DbTable dbTable);
+    TableInfo getTableInfoByDbTable(String tableName);
 
     /**
      * 通过DbTable获取TableInfo
@@ -46,7 +43,7 @@ public interface TableInfoService {
      * @param dbTables 原始表对象
      * @return 表信息对象
      */
-    default List<TableInfo> getTableInfoByDbTable(Collection<DbTable> dbTables) {
+    default List<TableInfo> getTableInfoByDbTable(Collection<String> dbTables) {
         if (CollectionUtil.isEmpty(dbTables)) {
             return Collections.EMPTY_LIST;
         }
@@ -58,10 +55,9 @@ public interface TableInfoService {
     /**
      * 获取表信息并加载配置信息
      *
-     * @param dbTable 原始表对象
      * @return 表信息对象
      */
-    TableInfo getTableInfoAndConfig(DbTable dbTable);
+    TableInfo getTableInfoAndConfig(String tableName);
 
     /**
      * 获取表信息并加载配置信息
@@ -69,7 +65,7 @@ public interface TableInfoService {
      * @param dbTables 原始表对象
      * @return 表信息对象
      */
-    default List<TableInfo> getTableInfoAndConfig(Collection<DbTable> dbTables) {
+    default List<TableInfo> getTableInfoAndConfig(Collection<String> dbTables) {
         if (CollectionUtil.isEmpty(dbTables)) {
             return Collections.EMPTY_LIST;
         }
@@ -77,14 +73,6 @@ public interface TableInfoService {
         dbTables.forEach(dbTable -> tableInfoList.add(this.getTableInfoAndConfig(dbTable)));
         return tableInfoList;
     }
-
-    /**
-     * 类型校验，如果存在未知类型则引导用于去条件类型
-     *
-     * @param dbTable 原始表对象
-     * @return 是否验证通过
-     */
-    boolean typeValidator(DbTable dbTable);
 
     /**
      * 保存数据

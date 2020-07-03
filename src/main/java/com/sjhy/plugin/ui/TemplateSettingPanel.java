@@ -1,12 +1,6 @@
 package com.sjhy.plugin.ui;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.intellij.database.model.DasNamespace;
-import com.intellij.database.model.DasObject;
-import com.intellij.database.model.DasTable;
-import com.intellij.database.psi.DbDataSource;
-import com.intellij.database.psi.DbPsiFacade;
-import com.intellij.database.psi.DbTable;
 import com.intellij.icons.AllIcons;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.fileTemplates.impl.UrlUtil;
@@ -285,9 +279,9 @@ public class TemplateSettingPanel implements Configurable {
         return groupName;
     }
 
-    private JBIterable<DasTable> getTables(DbDataSource dataSource) {
-        return dataSource.getModel().traverser().expandAndSkip(Conditions.instanceOf(DasNamespace.class)).filter(DasTable.class);
-    }
+//    private JBIterable<DasTable> getTables(DbDataSource dataSource) {
+//        return dataSource.getModel().traverser().expandAndSkip(Conditions.instanceOf(DasNamespace.class)).filter(DasTable.class);
+//    }
 
     /**
      * 添加调试面板
@@ -298,112 +292,112 @@ public class TemplateSettingPanel implements Configurable {
         panel.add(new JLabel("实时调试"));
 
         // 创建下拉框
-        List<String> tableList = new ArrayList<>();
-        List<DbDataSource> dataSourceList = DbPsiFacade.getInstance(project).getDataSources();
-        if (!CollectionUtil.isEmpty(dataSourceList)) {
-            dataSourceList.forEach(dbDataSource -> getTables(dbDataSource).forEach(table -> tableList.add(table.toString())));
-        }
-        ComboBoxModel<String> comboBoxModel = new CollectionComboBoxModel<>(tableList);
-        ComboBox<String> comboBox = new ComboBox<>(comboBoxModel);
-        panel.add(comboBox);
+//        List<String> tableList = new ArrayList<>();
+//        List<DbDataSource> dataSourceList = DbPsiFacade.getInstance(project).getDataSources();
+//        if (!CollectionUtil.isEmpty(dataSourceList)) {
+//            dataSourceList.forEach(dbDataSource -> getTables(dbDataSource).forEach(table -> tableList.add(table.toString())));
+//        }
+//        ComboBoxModel<String> comboBoxModel = new CollectionComboBoxModel<>(tableList);
+//        ComboBox<String> comboBox = new ComboBox<>(comboBoxModel);
+//        panel.add(comboBox);
 
         // 调试动作按钮
-        DefaultActionGroup actionGroup = new DefaultActionGroup(new AnAction(AllIcons.Debugger.Console) {
-            @Override
-            public void actionPerformed(AnActionEvent e) {
-                // 获取选中的表
-                String name = (String) comboBox.getSelectedItem();
-                List<DbDataSource> dataSourceList = DbPsiFacade.getInstance(project).getDataSources();
-                DasTable dasTable = null;
-                if (!CollectionUtil.isEmpty(dataSourceList)) {
-                    for (DbDataSource dbDataSource : dataSourceList) {
-                        for (DasTable table : getTables(dbDataSource)) {
-                            if (Objects.equals(table.toString(), name)) {
-                                dasTable = table;
-                            }
-                        }
-                    }
-                }
-                if (dasTable == null) {
-                    return;
-                }
-                DbTable dbTable = null;
-                if (dasTable instanceof DbTable) {
-                    // 针对2017.2版本做兼容
-                    dbTable = (DbTable) dasTable;
-                } else {
-                    Method method = ReflectionUtil.getMethod(DbPsiFacade.class, "findElement", DasObject.class);
-                    if (method == null) {
-                        Messages.showWarningDialog("findElement method not found", MsgValue.TITLE_INFO);
-                        return;
-                    }
-                    try {
-                        // 针对2017.2以上版本做兼容
-                        dbTable = (DbTable) method.invoke(DbPsiFacade.getInstance(project), dasTable);
-                    } catch (IllegalAccessException|InvocationTargetException e1) {
-                        ExceptionUtil.rethrow(e1);
-                    }
-                }
-                // 获取表信息
-                TableInfo tableInfo = TableInfoService.getInstance(project).getTableInfoAndConfig(dbTable);
-                // 为未配置的表设置一个默认包名
-                if (tableInfo.getSavePackageName() == null) {
-                    tableInfo.setSavePackageName("com.companyname.modulename");
-                }
-                // 生成代码
-                String code = CodeGenerateService.getInstance(project).generate(new Template("temp", templateEditor.getEditor().getDocument().getText()), tableInfo);
-
-                // 创建编辑框
-                EditorFactory editorFactory = EditorFactory.getInstance();
-                PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(project);
-                String fileName = templateEditor.getName();
-                FileType velocityFileType = FileTypeManager.getInstance().getFileTypeByExtension("vm");
-                PsiFile psiFile = psiFileFactory.createFileFromText("EasyCodeTemplateDebug.vm.ft", velocityFileType, code, 0, true);
-                // 标识为模板，让velocity跳过语法校验
-                psiFile.getViewProvider().putUserData(FileTemplateManager.DEFAULT_TEMPLATE_PROPERTIES, FileTemplateManager.getInstance(project).getDefaultProperties());
-                Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
-                assert document != null;
-                Editor editor = editorFactory.createEditor(document, project, velocityFileType, true);
-                // 配置编辑框
-                EditorSettings editorSettings = editor.getSettings();
-                // 关闭虚拟空间
-                editorSettings.setVirtualSpace(false);
-                // 关闭标记位置（断点位置）
-                editorSettings.setLineMarkerAreaShown(false);
-                // 关闭缩减指南
-                editorSettings.setIndentGuidesShown(false);
-                // 显示行号
-                editorSettings.setLineNumbersShown(true);
-                // 支持代码折叠
-                editorSettings.setFoldingOutlineShown(true);
-                // 附加行，附加列（提高视野）
-                editorSettings.setAdditionalColumnsCount(3);
-                editorSettings.setAdditionalLinesCount(3);
-                // 不显示换行符号
-                editorSettings.setCaretRowShown(false);
-                ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new LightVirtualFile(fileName)));
-                // 构建dialog
-                DialogBuilder dialogBuilder = new DialogBuilder(project);
-                dialogBuilder.setTitle(MsgValue.TITLE_INFO);
-                JComponent component = editor.getComponent();
-                component.setPreferredSize(new Dimension(800, 600));
-                dialogBuilder.setCenterPanel(component);
-                dialogBuilder.addCloseButton();
-                dialogBuilder.addDisposable(() -> {
-                    //释放掉编辑框
-                    editorFactory.releaseEditor(editor);
-                    dialogBuilder.dispose();
-                });
-                dialogBuilder.show();
-            }
-
-            @Override
-            public void update(AnActionEvent e) {
-                e.getPresentation().setEnabled(comboBox.getSelectedItem() != null);
-            }
-        });
-        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar("Template Debug", actionGroup, true);
-        panel.add(actionToolbar.getComponent());
+//        DefaultActionGroup actionGroup = new DefaultActionGroup(new AnAction(AllIcons.Debugger.Console) {
+//            @Override
+//            public void actionPerformed(AnActionEvent e) {
+//                // 获取选中的表
+//                String name = (String) comboBox.getSelectedItem();
+//                List<DbDataSource> dataSourceList = DbPsiFacade.getInstance(project).getDataSources();
+//                DasTable dasTable = null;
+//                if (!CollectionUtil.isEmpty(dataSourceList)) {
+//                    for (DbDataSource dbDataSource : dataSourceList) {
+//                        for (DasTable table : getTables(dbDataSource)) {
+//                            if (Objects.equals(table.toString(), name)) {
+//                                dasTable = table;
+//                            }
+//                        }
+//                    }
+//                }
+//                if (dasTable == null) {
+//                    return;
+//                }
+//                DbTable dbTable = null;
+//                if (dasTable instanceof DbTable) {
+//                    // 针对2017.2版本做兼容
+//                    dbTable = (DbTable) dasTable;
+//                } else {
+//                    Method method = ReflectionUtil.getMethod(DbPsiFacade.class, "findElement", DasObject.class);
+//                    if (method == null) {
+//                        Messages.showWarningDialog("findElement method not found", MsgValue.TITLE_INFO);
+//                        return;
+//                    }
+//                    try {
+//                        // 针对2017.2以上版本做兼容
+//                        dbTable = (DbTable) method.invoke(DbPsiFacade.getInstance(project), dasTable);
+//                    } catch (IllegalAccessException|InvocationTargetException e1) {
+//                        ExceptionUtil.rethrow(e1);
+//                    }
+//                }
+//                // 获取表信息
+//                TableInfo tableInfo = TableInfoService.getInstance(project).getTableInfoAndConfig(dbTable);
+//                // 为未配置的表设置一个默认包名
+//                if (tableInfo.getSavePackageName() == null) {
+//                    tableInfo.setSavePackageName("com.companyname.modulename");
+//                }
+//                // 生成代码
+//                String code = CodeGenerateService.getInstance(project).generate(new Template("temp", templateEditor.getEditor().getDocument().getText()), tableInfo);
+//
+//                // 创建编辑框
+//                EditorFactory editorFactory = EditorFactory.getInstance();
+//                PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(project);
+//                String fileName = templateEditor.getName();
+//                FileType velocityFileType = FileTypeManager.getInstance().getFileTypeByExtension("vm");
+//                PsiFile psiFile = psiFileFactory.createFileFromText("EasyCodeTemplateDebug.vm.ft", velocityFileType, code, 0, true);
+//                // 标识为模板，让velocity跳过语法校验
+//                psiFile.getViewProvider().putUserData(FileTemplateManager.DEFAULT_TEMPLATE_PROPERTIES, FileTemplateManager.getInstance(project).getDefaultProperties());
+//                Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
+//                assert document != null;
+//                Editor editor = editorFactory.createEditor(document, project, velocityFileType, true);
+//                // 配置编辑框
+//                EditorSettings editorSettings = editor.getSettings();
+//                // 关闭虚拟空间
+//                editorSettings.setVirtualSpace(false);
+//                // 关闭标记位置（断点位置）
+//                editorSettings.setLineMarkerAreaShown(false);
+//                // 关闭缩减指南
+//                editorSettings.setIndentGuidesShown(false);
+//                // 显示行号
+//                editorSettings.setLineNumbersShown(true);
+//                // 支持代码折叠
+//                editorSettings.setFoldingOutlineShown(true);
+//                // 附加行，附加列（提高视野）
+//                editorSettings.setAdditionalColumnsCount(3);
+//                editorSettings.setAdditionalLinesCount(3);
+//                // 不显示换行符号
+//                editorSettings.setCaretRowShown(false);
+//                ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new LightVirtualFile(fileName)));
+//                // 构建dialog
+//                DialogBuilder dialogBuilder = new DialogBuilder(project);
+//                dialogBuilder.setTitle(MsgValue.TITLE_INFO);
+//                JComponent component = editor.getComponent();
+//                component.setPreferredSize(new Dimension(800, 600));
+//                dialogBuilder.setCenterPanel(component);
+//                dialogBuilder.addCloseButton();
+//                dialogBuilder.addDisposable(() -> {
+//                    //释放掉编辑框
+//                    editorFactory.releaseEditor(editor);
+//                    dialogBuilder.dispose();
+//                });
+//                dialogBuilder.show();
+//            }
+//
+//            @Override
+//            public void update(AnActionEvent e) {
+//                e.getPresentation().setEnabled(comboBox.getSelectedItem() != null);
+//            }
+//        });
+//        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar("Template Debug", actionGroup, true);
+//        panel.add(actionToolbar.getComponent());
         baseGroupPanel.add(panel, BorderLayout.EAST);
     }
 

@@ -1,8 +1,8 @@
 package com.sjhy.plugin.service.impl;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.intellij.database.util.DasUtil;
-import com.intellij.database.util.DbUtil;
+//import com.intellij.database.util.DasUtil;
+//import com.intellij.database.util.DbUtil;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.module.ModuleUtil;
@@ -70,7 +70,7 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
         List<TableInfo> tableInfoList = tableInfoService.getTableInfoAndConfig(cacheDataUtils.getDbTableList());
         // 校验选中表的保存路径是否正确
         if (StringUtils.isEmpty(selectedTableInfo.getSavePath())) {
-            Messages.showInfoMessage(selectedTableInfo.getObj().getName() + "表配置信息不正确，请尝试重新配置", MsgValue.TITLE_INFO);
+            Messages.showInfoMessage(selectedTableInfo.getName() + "表配置信息不正确，请尝试重新配置", MsgValue.TITLE_INFO);
             return;
         }
         // 将未配置的表进行配置覆盖
@@ -90,7 +90,8 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
                 tableInfo.setSavePath(selectedTableInfo.getSavePath());
             });
         }
-
+        System.out.println(tableInfoList);
+        System.out.println(tableInfoList.size());
         // 生成代码
         generate(templates, tableInfoList, title);
     }
@@ -125,10 +126,10 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
         // 生成代码
         for (TableInfo tableInfo : tableInfoList) {
             // 表名去除前缀
-            if (!StringUtils.isEmpty(tableInfo.getPreName()) && tableInfo.getObj().getName().startsWith(tableInfo.getPreName())) {
-                String newName = tableInfo.getObj().getName().replace(tableInfo.getPreName(), "");
-                tableInfo.setName(NameUtils.getInstance().getClassName(newName));
-            }
+//            if (!StringUtils.isEmpty(tableInfo.getPreName()) && tableInfo.getObj().getName().startsWith(tableInfo.getPreName())) {
+//                String newName = tableInfo.getObj().getName().replace(tableInfo.getPreName(), "");
+//                tableInfo.setName(NameUtils.getInstance().getClassName(newName));
+//            }
             // 构建参数
             Map<String, Object> param = getDefaultParam();
             // 其他参数
@@ -224,9 +225,6 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
         param.put("time", TimeUtils.getInstance());
         // 项目路径
         param.put("projectPath", project.getBasePath());
-        // Database数据库工具
-        param.put("dbUtil", ReflectionUtil.newInstance(DbUtil.class));
-        param.put("dasUtil", ReflectionUtil.newInstance(DasUtil.class));
         return param;
     }
 

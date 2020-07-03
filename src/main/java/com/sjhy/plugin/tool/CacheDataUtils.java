@@ -1,6 +1,5 @@
 package com.sjhy.plugin.tool;
 
-import com.intellij.database.psi.DbTable;
 import lombok.Data;
 
 import java.util.List;
@@ -36,9 +35,9 @@ public class CacheDataUtils {
     /**
      * 当前选中的表
      */
-    private DbTable selectDbTable;
+    private String selectDbTable;
     /**
      * 所有选中的表
      */
-    private List<DbTable> dbTableList;
+    private List<String> dbTableList;
 }

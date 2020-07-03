@@ -1,6 +1,6 @@
 package com.sjhy.plugin.actions;
 
-import com.intellij.database.psi.DbTable;
+//import com.intellij.database.psi.DbTable;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -55,35 +55,35 @@ public class MainActionGroup extends ActionGroup {
             return getEmptyAnAction();
         }
 
-        //获取选中的PSI元素
-        PsiElement psiElement = event.getData(LangDataKeys.PSI_ELEMENT);
-        DbTable selectDbTable = null;
-        if (psiElement instanceof DbTable) {
-            selectDbTable = (DbTable) psiElement;
-        }
-        if (selectDbTable == null) {
-            return getEmptyAnAction();
-        }
-        //获取选中的所有表
-        PsiElement[] psiElements = event.getData(LangDataKeys.PSI_ELEMENT_ARRAY);
-        if (psiElements == null || psiElements.length == 0) {
-            return getEmptyAnAction();
-        }
-        List<DbTable> dbTableList = new ArrayList<>();
-        for (PsiElement element : psiElements) {
-            if (!(element instanceof DbTable)) {
-                continue;
-            }
-            DbTable dbTable = (DbTable) element;
-            dbTableList.add(dbTable);
-        }
-        if (dbTableList.isEmpty()) {
-            return getEmptyAnAction();
-        }
+//        //获取选中的PSI元素
+//        PsiElement psiElement = event.getData(LangDataKeys.PSI_ELEMENT);
+//        String selectDbTable = null;
+//        if (psiElement instanceof String) {
+//            selectDbTable = (String) psiElement;
+//        }
+//        if (selectDbTable == null) {
+//            return getEmptyAnAction();
+//        }
+//        //获取选中的所有表
+//        PsiElement[] psiElements = event.getData(LangDataKeys.PSI_ELEMENT_ARRAY);
+//        if (psiElements == null || psiElements.length == 0) {
+//            return getEmptyAnAction();
+//        }
+//        List<DbTable> dbTableList = new ArrayList<>();
+//        for (PsiElement element : psiElements) {
+//            if (!(element instanceof DbTable)) {
+//                continue;
+//            }
+//            DbTable dbTable = (DbTable) element;
+//            dbTableList.add(dbTable);
+//        }
+//        if (dbTableList.isEmpty()) {
+//            return getEmptyAnAction();
+//        }
 
         //保存数据到缓存
-        cacheDataUtils.setDbTableList(dbTableList);
-        cacheDataUtils.setSelectDbTable(selectDbTable);
+//        cacheDataUtils.setDbTableList(dbTableList);
+//        cacheDataUtils.setSelectDbTable(selectDbTable);
         this.notExistsChildren = false;
         return getMenuList();
     }
