@@ -1,0 +1,24 @@
+##定义初始变量
+#set($tableName = $tool.append($tableInfo.name, "Repository"))
+##设置回调
+$!callback.setFileName($tool.append($tableName, ".java"))
+$!callback.setSavePath($tool.append($tableInfo.savePath, "/repository"))
+
+##拿到主键
+#if(!$tableInfo.pkColumn.isEmpty())
+    #set($pk = $tableInfo.pkColumn.get(0))
+#end
+
+#if($tableInfo.savePackageName)package $!{tableInfo.savePackageName}.#{end}repository;
+
+import $!{tableInfo.savePackageName}$tool.append(".entity.")$!{tableInfo.name}Entity;
+import org.springframework.data.repository.CrudRepository;
+
+/**
+ * $!{tableInfo.comment}($!{tableInfo.name})数据库持久层
+ *
+ * @author $!author
+ * @since $!time.currTime()
+ */
+public interface $!{tableName} extends CrudRepository<$!{tableName}Entity, Long> {
+}

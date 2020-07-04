@@ -1,0 +1,32 @@
+##引入宏定义
+$!define
+
+$!callback.setFileName($tool.append($tableInfo.name, "QueryVO.java"))
+$!callback.setSavePath($tool.append($tableInfo.savePath, "/obj"))
+
+##使用宏定义设置包后缀
+#setPackageSuffix("obj")
+
+##使用全局变量实现默认包导入
+$!autoImport
+import lombok.EqualsAndHashCode;
+import lombok.Data;
+import lombok.experimental.Accessors;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+import java.io.Serializable;
+
+##使用宏定义实现类注释信息
+#tableComment("查询参数")
+@Data
+@EqualsAndHashCode
+@Accessors(chain = true)
+@ApiModel
+public class $!{tableInfo.name}QueryVO implements Serializable {
+    private static final long serialVersionUID = $!tool.serial();
+    #foreach($column in $tableInfo.fullColumn)
+        @ApiModelProperty(value="$!{column.comment}")
+        private $!{tool.getClsNameByFullName($column.type)} $!{column.name};
+    #end
+}
