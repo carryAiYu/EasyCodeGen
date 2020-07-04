@@ -1,34 +1,21 @@
-# EasyCode
+# EasyCode Gen
+### 本项目继承自![EasyCode](https://github.com/makejavas/EasyCode)
 
-### EasyCode能做什么？
+### EasyCode Gen能做什么？
 
-> EasyCode是基于IntelliJ IDEA Ultimate版开发的一个代码生成插件，主要通过自定义模板（基于velocity）来生成各种你想要的代码。通常用于生成Entity、Dao、Service、Controller。如果你动手能力强还可以用于生成HTML、JS、PHP等代码。理论上来说只要是与数据有关的代码都是可以生成的。
+> EasyCode是基于IntelliJ IDEA ~~Ultimate~~版开发的一个代码生成插件，主要通过自定义模板（基于velocity）来生成各种你想要的代码。通常用于生成Entity、Dao、Service、Controller。如果你动手能力强还可以用于生成HTML、JS、PHP等代码。理论上来说只要是与数据有关的代码都是可以生成的。
 ---
+> 将EasyCode修改以使用与Community版
 ### 使用环境
-`IntelliJ IDEA Ultimate版（172+）`
+`IntelliJ IDEA Community And Ultimate版（172+）`
 
-### 支持的数据库类型
-##### 因为是基于Database Tool开发，所有Database Tool支持的数据库都是支持的。
-
-包括如下数据库：
-> 1. MySQL
-> 2. SQL Server
-> 3. Oracle
-> 4. PostgreSQL
-> 5. Sqlite
-> 6. Sybase
-> 7. Derby
-> 8. DB2
-> 9. HSQLDB
-> 10. H2
->  
-> 当然支持的数据库类型也会随着Database Tool插件的更新同步更新。
+## 使用自定义表结构构建 
 
 ### 功能说明：
 * 支持多表同时操作
 * 支持同时生成多个模板
 * 支持自定义模板
-* 支持自定义类型映射（支持正则）
+* 支持自定义类型映射
 * 支持自定义附加列
 * 支持列附加属性
 * 所有配置项目支持分组模式，在不同项目（或选择不同数据库时），只需要切换对应的分组，所有配置统一变化。
