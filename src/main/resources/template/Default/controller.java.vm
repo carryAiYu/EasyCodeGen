@@ -21,12 +21,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import $!{tableInfo.savePackageName}.entity.$!{tableInfo.name}Entity;
-import $!{tableInfo.savePackageName}.obj.$!{tableInfo.name}DTO;
-import $!{tableInfo.savePackageName}.obj.$!{tableInfo.name}VO;
-import $!{tableInfo.savePackageName}.obj.$!{tableInfo.name}QueryVO;
-import $!{tableInfo.savePackageName}.obj.I$!{tableInfo.name}Service;
-
+import $!{tableInfo.savePackageName}$tool.append(".entity.")$!{tableInfo.name}Entity;
+import $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}DTO;
+import $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}VO;
+import $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}QueryVO;
+import $!{tableInfo.savePackageName}$tool.append(".service.")I$!{tableInfo.name}Service;
 
 import java.util.List;
 
@@ -53,8 +52,8 @@ public class $!{tableName} {
         return ResponseUtil.successSaveResponse();
     $tool.append("}")
 
-    @ApiOperation(value = "创建 $tableInfo.name")
-    @RequestMapping(value = "newOne", method = RequestMethod.POST)
+    @ApiOperation(value = "更新 $tableInfo.name")
+    @RequestMapping(value = "updateOne", method = RequestMethod.POST)
     public Message updateOne(@RequestBody $!{tableInfo.name}VO $!tool.firstLowerCase($tableInfo.name)VO) $tool.append("{")
         $!tool.firstLowerCase($tableInfo.name)Service$!tool.append(".updateOne(")$!tool.firstLowerCase($tableInfo.name)VO$tool.append(")");
         return ResponseUtil.successUpdateResponse();

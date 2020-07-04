@@ -110,7 +110,6 @@ public class TemplateEditor {
         LightVirtualFile virtualFile = new LightVirtualFile(EASY_CODE_TEMPLATE, fileType, content, LocalTimeCounter.currentTime());
         // 标识为模板，让velocity跳过语法校验
         virtualFile.putUserData(FileTemplateManager.DEFAULT_TEMPLATE_PROPERTIES, FileTemplateManager.getInstance(project).getDefaultProperties());
-
         // 创建文档对象
         Document document = FileDocumentManager.getInstance().getDocument(virtualFile);
         assert document != null;

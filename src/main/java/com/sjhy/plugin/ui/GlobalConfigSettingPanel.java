@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.intellij.ide.fileTemplates.impl.UrlUtil;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
@@ -215,6 +216,7 @@ public class GlobalConfigSettingPanel implements Configurable {
                 // 如果编辑面板已经实例化，需要选释放后再初始化
                 if (templateEditor == null) {
                     FileType velocityFileType = FileTypeManager.getInstance().getFileTypeByExtension("vm");
+                    velocityFileType = FileTypes.PLAIN_TEXT; // because IC don`t parser vm
                     templateEditor = new TemplateEditor(project, item.getName() + ".vm", item.getValue(), GLOBAL_CONFIG_DESCRIPTION_INFO, velocityFileType);
                     // 代码修改回调
                     templateEditor.setCallback(() -> onUpdate());

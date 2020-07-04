@@ -90,8 +90,6 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
                 tableInfo.setSavePath(selectedTableInfo.getSavePath());
             });
         }
-        System.out.println(tableInfoList);
-        System.out.println(tableInfoList.size());
         // 生成代码
         generate(templates, tableInfoList, title);
     }
@@ -126,10 +124,10 @@ public class CodeGenerateServiceImpl implements CodeGenerateService {
         // 生成代码
         for (TableInfo tableInfo : tableInfoList) {
             // 表名去除前缀
-//            if (!StringUtils.isEmpty(tableInfo.getPreName()) && tableInfo.getObj().getName().startsWith(tableInfo.getPreName())) {
-//                String newName = tableInfo.getObj().getName().replace(tableInfo.getPreName(), "");
-//                tableInfo.setName(NameUtils.getInstance().getClassName(newName));
-//            }
+            if (!StringUtils.isEmpty(tableInfo.getPreName()) && tableInfo.getName().startsWith(tableInfo.getPreName())) {
+                String newName = tableInfo.getName().replace(tableInfo.getPreName(), "");
+                tableInfo.setName(NameUtils.getInstance().getClassName(newName));
+            }
             // 构建参数
             Map<String, Object> param = getDefaultParam();
             // 其他参数

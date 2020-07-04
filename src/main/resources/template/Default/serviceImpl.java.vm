@@ -12,8 +12,13 @@ $!callback.setSavePath($tool.append($tableInfo.savePath, "/service/impl"))
 
 #if($tableInfo.savePackageName)package $!{tableInfo.savePackageName}.#{end}service.impl;
 
-import $!{tableInfo.savePackageName}.entity.$!{tableInfo.name};
-import $!{tableInfo.savePackageName}.service.I$!{tableInfo.name}Service;
+import $!{tableInfo.savePackageName}$tool.append(".entity.")$!{tableInfo.name};
+import $!{tableInfo.savePackageName}$tool.append(".service.")I$!{tableInfo.name}Service;
+import $!{tableInfo.savePackageName}$tool.append(".repository.")$!{tableInfo.name}Repository;
+import $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}VO;
+import $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}QueryVO;
+import $!{tableInfo.savePackageName}$tool.append(".obj.")$!{tableInfo.name}DTO;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +43,7 @@ public class $!{tableName} implements I$!{tableInfo.name}Service {
      * @param $!tool.firstLowerCase($tableInfo.name)QueryVO 查询参数
      * @return 实例对象
      */
+    @Override
     public $!{tableInfo.name}DTO fineOne($!{tableInfo.name}QueryVO $!tool.firstLowerCase($tableInfo.name)QueryVO) $tool.append("{")
         return $!tool.firstLowerCase($tableInfo.name)Repository$tool.append(".findById().map")$tool.append("(")
                 $!tool.firstLowerCase($tableInfo.name)Entity $tool.append(" -> {")
@@ -52,6 +58,7 @@ public class $!{tableName} implements I$!{tableInfo.name}Service {
      * @param $!tool.firstLowerCase($tableInfo.name)QueryVO 查询参数
      * @return 对象列表
      */
+    @Override
     Page<$!{tableInfo.name}DTO> queryAll($!{tableInfo.name}QueryVO $!tool.firstLowerCase($tableInfo.name)QueryVO) $tool.append("{")
         return $!tool.firstLowerCase($tableInfo.name)Repository$tool.append(".findAll().map")$tool.append("(")
             $!tool.firstLowerCase($tableInfo.name)Entity $tool.append(" -> {")
@@ -71,6 +78,7 @@ public class $!{tableName} implements I$!{tableInfo.name}Service {
      *
      * @param $!tool.firstLowerCase($tableInfo.name)VO 实例对象
      */
+    @Override
     public void newOne($!{tableInfo.name}VO $!tool.firstLowerCase($tableInfo.name)VO) $tool.append("{")
         CrudUtil.saveUpdate($!tool.firstLowerCase($tableInfo.name)VO, $!tool.firstLowerCase($tableInfo.name)Entity$tool.append(".class"), null)
     $tool.append("}")

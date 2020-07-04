@@ -97,7 +97,7 @@ public class Settings implements PersistentStateComponent<Settings> {
         // 版本号
         this.version = "1.2.4";
         // 作者名称
-        this.author = "makejava";
+        this.author = "TTV";
         // 当前各项分组名称
         this.currTemplateGroupName = DEFAULT_NAME;
         this.currTypeMapperGroupName = DEFAULT_NAME;

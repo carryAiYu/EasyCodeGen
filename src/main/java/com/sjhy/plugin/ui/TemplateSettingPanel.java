@@ -13,6 +13,7 @@ import com.intellij.openapi.editor.ex.EditorEx;
 import com.intellij.openapi.editor.highlighter.EditorHighlighterFactory;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
+import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
@@ -45,6 +46,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -241,6 +243,7 @@ public class TemplateSettingPanel implements Configurable {
                 // 如果编辑面板已经实例化，需要选释放后再初始化
                 if (templateEditor == null) {
                     FileType velocityFileType = FileTypeManager.getInstance().getFileTypeByExtension("vm");
+                    velocityFileType = FileTypes.PLAIN_TEXT; // because IC don`t parser vm
                     templateEditor = new TemplateEditor(project, item.getName() + ".vm", item.getCode(), TEMPLATE_DESCRIPTION_INFO, velocityFileType);
                     // 代码修改回调
                     templateEditor.setCallback(() -> onUpdate());
@@ -279,9 +282,33 @@ public class TemplateSettingPanel implements Configurable {
         return groupName;
     }
 
-//    private JBIterable<DasTable> getTables(DbDataSource dataSource) {
-//        return dataSource.getModel().traverser().expandAndSkip(Conditions.instanceOf(DasNamespace.class)).filter(DasTable.class);
-//    }
+    /**
+     * 保存的相对路径
+     */
+    private static final String SAVE_PATH = "/.idea/EasyCodeConfig";
+
+    private List<String> readTableList() {
+        // 获取保存的目录
+        String path = project.getBasePath() + SAVE_PATH;
+        File dir = new File(path);
+        // 文件不存在时直接返回
+        List<String> tableList = new ArrayList<>();
+        if (!dir.exists()) {
+            return tableList;
+        }
+        for (File file : dir.listFiles()) {
+            String fileName = file.getName();
+            String[] fileNames = fileName.split("\\.");
+            if (fileNames.length > 0) {
+                fileName = fileNames[0];
+                fileNames = fileName.split("-");
+                if (fileNames.length > 1) {
+                    tableList.add(fileNames[1]);
+                }
+            }
+        }
+        return tableList;
+    }
 
     /**
      * 添加调试面板
@@ -292,112 +319,78 @@ public class TemplateSettingPanel implements Configurable {
         panel.add(new JLabel("实时调试"));
 
         // 创建下拉框
-//        List<String> tableList = new ArrayList<>();
-//        List<DbDataSource> dataSourceList = DbPsiFacade.getInstance(project).getDataSources();
-//        if (!CollectionUtil.isEmpty(dataSourceList)) {
-//            dataSourceList.forEach(dbDataSource -> getTables(dbDataSource).forEach(table -> tableList.add(table.toString())));
-//        }
-//        ComboBoxModel<String> comboBoxModel = new CollectionComboBoxModel<>(tableList);
-//        ComboBox<String> comboBox = new ComboBox<>(comboBoxModel);
-//        panel.add(comboBox);
+        List<String> tableList = readTableList();
+        ComboBoxModel<String> comboBoxModel = new CollectionComboBoxModel<>(tableList);
+        ComboBox<String> comboBox = new ComboBox<>(comboBoxModel);
+        panel.add(comboBox);
 
         // 调试动作按钮
-//        DefaultActionGroup actionGroup = new DefaultActionGroup(new AnAction(AllIcons.Debugger.Console) {
-//            @Override
-//            public void actionPerformed(AnActionEvent e) {
-//                // 获取选中的表
-//                String name = (String) comboBox.getSelectedItem();
-//                List<DbDataSource> dataSourceList = DbPsiFacade.getInstance(project).getDataSources();
-//                DasTable dasTable = null;
-//                if (!CollectionUtil.isEmpty(dataSourceList)) {
-//                    for (DbDataSource dbDataSource : dataSourceList) {
-//                        for (DasTable table : getTables(dbDataSource)) {
-//                            if (Objects.equals(table.toString(), name)) {
-//                                dasTable = table;
-//                            }
-//                        }
-//                    }
-//                }
-//                if (dasTable == null) {
-//                    return;
-//                }
-//                DbTable dbTable = null;
-//                if (dasTable instanceof DbTable) {
-//                    // 针对2017.2版本做兼容
-//                    dbTable = (DbTable) dasTable;
-//                } else {
-//                    Method method = ReflectionUtil.getMethod(DbPsiFacade.class, "findElement", DasObject.class);
-//                    if (method == null) {
-//                        Messages.showWarningDialog("findElement method not found", MsgValue.TITLE_INFO);
-//                        return;
-//                    }
-//                    try {
-//                        // 针对2017.2以上版本做兼容
-//                        dbTable = (DbTable) method.invoke(DbPsiFacade.getInstance(project), dasTable);
-//                    } catch (IllegalAccessException|InvocationTargetException e1) {
-//                        ExceptionUtil.rethrow(e1);
-//                    }
-//                }
-//                // 获取表信息
-//                TableInfo tableInfo = TableInfoService.getInstance(project).getTableInfoAndConfig(dbTable);
-//                // 为未配置的表设置一个默认包名
-//                if (tableInfo.getSavePackageName() == null) {
-//                    tableInfo.setSavePackageName("com.companyname.modulename");
-//                }
-//                // 生成代码
-//                String code = CodeGenerateService.getInstance(project).generate(new Template("temp", templateEditor.getEditor().getDocument().getText()), tableInfo);
-//
-//                // 创建编辑框
-//                EditorFactory editorFactory = EditorFactory.getInstance();
-//                PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(project);
-//                String fileName = templateEditor.getName();
-//                FileType velocityFileType = FileTypeManager.getInstance().getFileTypeByExtension("vm");
-//                PsiFile psiFile = psiFileFactory.createFileFromText("EasyCodeTemplateDebug.vm.ft", velocityFileType, code, 0, true);
-//                // 标识为模板，让velocity跳过语法校验
-//                psiFile.getViewProvider().putUserData(FileTemplateManager.DEFAULT_TEMPLATE_PROPERTIES, FileTemplateManager.getInstance(project).getDefaultProperties());
-//                Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
-//                assert document != null;
-//                Editor editor = editorFactory.createEditor(document, project, velocityFileType, true);
-//                // 配置编辑框
-//                EditorSettings editorSettings = editor.getSettings();
-//                // 关闭虚拟空间
-//                editorSettings.setVirtualSpace(false);
-//                // 关闭标记位置（断点位置）
-//                editorSettings.setLineMarkerAreaShown(false);
-//                // 关闭缩减指南
-//                editorSettings.setIndentGuidesShown(false);
-//                // 显示行号
-//                editorSettings.setLineNumbersShown(true);
-//                // 支持代码折叠
-//                editorSettings.setFoldingOutlineShown(true);
-//                // 附加行，附加列（提高视野）
-//                editorSettings.setAdditionalColumnsCount(3);
-//                editorSettings.setAdditionalLinesCount(3);
-//                // 不显示换行符号
-//                editorSettings.setCaretRowShown(false);
-//                ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new LightVirtualFile(fileName)));
-//                // 构建dialog
-//                DialogBuilder dialogBuilder = new DialogBuilder(project);
-//                dialogBuilder.setTitle(MsgValue.TITLE_INFO);
-//                JComponent component = editor.getComponent();
-//                component.setPreferredSize(new Dimension(800, 600));
-//                dialogBuilder.setCenterPanel(component);
-//                dialogBuilder.addCloseButton();
-//                dialogBuilder.addDisposable(() -> {
-//                    //释放掉编辑框
-//                    editorFactory.releaseEditor(editor);
-//                    dialogBuilder.dispose();
-//                });
-//                dialogBuilder.show();
-//            }
-//
-//            @Override
-//            public void update(AnActionEvent e) {
-//                e.getPresentation().setEnabled(comboBox.getSelectedItem() != null);
-//            }
-//        });
-//        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar("Template Debug", actionGroup, true);
-//        panel.add(actionToolbar.getComponent());
+        DefaultActionGroup actionGroup = new DefaultActionGroup(new AnAction(AllIcons.Debugger.Console) {
+            @Override
+            public void actionPerformed(AnActionEvent e) {
+                // 获取选中的表
+                String name = (String) comboBox.getSelectedItem();
+                // 获取表信息
+                TableInfo tableInfo = TableInfoService.getInstance(project).getTableInfoAndConfig(name);
+                // 为未配置的表设置一个默认包名
+                if (tableInfo.getSavePackageName() == null) {
+                    tableInfo.setSavePackageName("com.companyname.modulename");
+                }
+                // 生成代码
+                String code = CodeGenerateService.getInstance(project).generate(new Template("temp", templateEditor.getEditor().getDocument().getText()), tableInfo);
+
+                // 创建编辑框
+                EditorFactory editorFactory = EditorFactory.getInstance();
+                PsiFileFactory psiFileFactory = PsiFileFactory.getInstance(project);
+                String fileName = templateEditor.getName();
+                FileType velocityFileType = FileTypeManager.getInstance().getFileTypeByExtension("vm");
+                velocityFileType = FileTypes.PLAIN_TEXT;
+                PsiFile psiFile = psiFileFactory.createFileFromText("EasyCodeTemplateDebug.vm.ft", velocityFileType, code, 0, true);
+                // 标识为模板，让velocity跳过语法校验
+                psiFile.getViewProvider().putUserData(FileTemplateManager.DEFAULT_TEMPLATE_PROPERTIES, FileTemplateManager.getInstance(project).getDefaultProperties());
+                Document document = PsiDocumentManager.getInstance(project).getDocument(psiFile);
+                assert document != null;
+                Editor editor = editorFactory.createEditor(document, project, velocityFileType, true);
+                // 配置编辑框
+                EditorSettings editorSettings = editor.getSettings();
+                // 关闭虚拟空间
+                editorSettings.setVirtualSpace(false);
+                // 关闭标记位置（断点位置）
+                editorSettings.setLineMarkerAreaShown(false);
+                // 关闭缩减指南
+                editorSettings.setIndentGuidesShown(false);
+                // 显示行号
+                editorSettings.setLineNumbersShown(true);
+                // 支持代码折叠
+                editorSettings.setFoldingOutlineShown(true);
+                // 附加行，附加列（提高视野）
+                editorSettings.setAdditionalColumnsCount(3);
+                editorSettings.setAdditionalLinesCount(3);
+                // 不显示换行符号
+                editorSettings.setCaretRowShown(false);
+                ((EditorEx) editor).setHighlighter(EditorHighlighterFactory.getInstance().createEditorHighlighter(project, new LightVirtualFile(fileName)));
+                // 构建dialog
+                DialogBuilder dialogBuilder = new DialogBuilder(project);
+                dialogBuilder.setTitle(MsgValue.TITLE_INFO);
+                JComponent component = editor.getComponent();
+                component.setPreferredSize(new Dimension(800, 600));
+                dialogBuilder.setCenterPanel(component);
+                dialogBuilder.addCloseButton();
+                dialogBuilder.addDisposable(() -> {
+                    //释放掉编辑框
+                    editorFactory.releaseEditor(editor);
+                    dialogBuilder.dispose();
+                });
+                dialogBuilder.show();
+            }
+
+            @Override
+            public void update(AnActionEvent e) {
+                e.getPresentation().setEnabled(comboBox.getSelectedItem() != null);
+            }
+        });
+        ActionToolbar actionToolbar = ActionManager.getInstance().createActionToolbar("Template Debug", actionGroup, true);
+        panel.add(actionToolbar.getComponent());
         baseGroupPanel.add(panel, BorderLayout.EAST);
     }
 

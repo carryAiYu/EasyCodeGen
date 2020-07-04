@@ -1,7 +1,7 @@
 ##引入宏定义
 $!define
 
-$!callback.setFileName($tool.append($tableName, "Entity.java"))
+$!callback.setFileName($tool.append($tableInfo.name, "Entity.java"))
 $!callback.setSavePath($tool.append($tableInfo.savePath, "/entity"))
 
 ##使用宏定义设置包后缀
@@ -24,7 +24,7 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Entity
-@@Table(name = "$tool.hump2Underline($tableInfo.name})")
+@Table$tool.append('(name = "')$tool.hump2Underline($tableInfo.name)$tool.append('")')
 @DynamicUpdate
 @DynamicInsert
 @Accessors(chain = true)
@@ -37,7 +37,7 @@ public class $!{tableInfo.name}Entity extends BaseEntity {
 
     public $!{tableInfo.name}Entity($!{tableInfo.name}VO $!tool.firstLowerCase($tableInfo.name)VO) {
         #foreach($column in $tableInfo.fullColumn)
-            this.$!{column.name} = $!tool.firstLowerCase($tableInfo.name)VO$tool.append(".get")$!{column.name}$tool.append("()");
+            this.$!{column.name} = $!tool.firstLowerCase($tableInfo.name)VO$tool.append(".get")$!tool.firstUpperCase(${column.name})$tool.append("()");
         #end
     }
 }

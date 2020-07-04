@@ -33,12 +33,7 @@
     <!-- uncomment to enable plugin in all products
 
     -->
-    <!--必须为企业版-->
     <depends>com.intellij.modules.lang</depends>
-    <!--必须依赖Database Tool插件-->
-<!--    <depends>com.intellij.database</depends>-->
-    <!--必须依赖Velocity插件-->
-<!--    <depends>com.intellij.velocity</depends>-->
 
     <!--扩展点-->
     <extensions defaultExtensionNs="com.intellij">
@@ -56,10 +51,6 @@
 
     <actions>
         <!-- Add your actions here -->
-<!--        <group id="con.sjhy.easy.code.action" class="com.sjhy.plugin.actions.MainActionGroup" text="EasyCode" popup="true">-->
-<!--            &lt;!&ndash;生成代码菜单&ndash;&gt;-->
-<!--            <add-to-group group-id="DatabaseViewPopupMenu" anchor="first"/>-->
-<!--        </group>-->
         <action id="TableListList" class="com.sjhy.plugin.actions.TableListAction" text="Easy Code Gen">
             <add-to-group group-id="NewGroup" anchor="first"/>
         </action>
