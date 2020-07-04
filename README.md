@@ -1,5 +1,5 @@
 # EasyCode Gen
-### 本项目继承自![EasyCode](https://github.com/makejavas/EasyCode)
+### 本项目继承自[EasyCode](https://github.com/makejavas/EasyCode)
 
 ### EasyCode Gen能做什么？
 
